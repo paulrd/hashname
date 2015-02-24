@@ -64,4 +64,4 @@
       (and (string? id) (= (count id) 2)
            (try 
              (= (format "%x" (Byte/parseByte id 16)) id)
-             (catch NumberFormatException e false)))))
+             (catch NumberFormatException _ false)))))
