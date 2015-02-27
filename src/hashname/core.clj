@@ -3,6 +3,11 @@
            org.apache.commons.codec.binary.Hex
            org.apache.commons.codec.digest.DigestUtils))
 
+(defn hex-to-buffer 
+  "Takes a hex number as a string and converts it to a byte-array."
+  [hex-str]
+  (-> hex-str char-array Hex/decodeHex))
+
 (defn base-32-encode
   "simple wrapper to handle buffer (byte-array) -> base32"
   [ba]
@@ -14,12 +19,18 @@
   [b32]
   (->> b32 .toUpperCase (.decode (Base32.))))
 
-(defn rf- [rollup [k v]]
+(defn- rf [rollup [k v]]
   (let [ru (try (-> k (Byte/parseByte 16) vector byte-array (#(concat rollup %))
                     byte-array DigestUtils/sha256)
                 (catch NumberFormatException e 
                   (throw (Throwable. "cipher key must be a valid hex string"))))]
     (->> v (concat ru) byte-array DigestUtils/sha256)))
+
+(defn buffer? [id]
+  (= (.getClass id) (Class/forName "[B")))
+
+(defn- decode-if-not-buffer [id]
+  (if (buffer? id) id (base-32-decode id)))
 
 (defn from-keys
   "generate hashname from keys json, vals are either base32 keys or key binary
@@ -27,8 +38,9 @@
   [keys-map]
   (when (empty? keys-map) (throw (Throwable. "keys-map should not be empty")))
   (->> keys-map 
-       (reduce-kv #(assoc %1 %2 (DigestUtils/sha256 (base-32-decode %3))) 
-                  (sorted-map))
+       (reduce-kv 
+        #(->> %3 decode-if-not-buffer DigestUtils/sha256 (assoc %1 %2))
+        (sorted-map))
        (reduce rf (byte-array [])) base-32-encode))
 
 (defn- rpf 
@@ -59,9 +71,12 @@
   (and (string? hn) (= (count hn) 52) (= (count (base-32-decode hn)) 32)))
 
 (defn id? [id]
-  (or (and (= (.getClass id) (Class/forName "[B"))
+  (or (and (buffer? id)
            (= (count id) 1))
       (and (string? id) (= (count id) 2)
            (try 
              (= (format "%x" (Byte/parseByte id 16)) id)
              (catch NumberFormatException _ false)))))
+
+(defn match [keys1 keys2]
+  (-> keys1 set (clojure.set/intersection (set keys2)) sort last))
