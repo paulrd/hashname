@@ -3,8 +3,16 @@
 A Clojure library that implements telehash/hashname.
 
 * Usage
-
-FIXME
+- Put the following into your project file:
+[ca.unstate/hashname "1.0.1"]
+- Put this in your namespace imports:
+```
+(:require [hashname.core :as hn])
+```
+```clojure
+(hn/from-keys {"3a" "hp6yglmmqwcbw5hno37uauh6fn6dx5oj7s5vtapaifrur2jv6zha"
+               "1a" "vgjz3yjb6cevxjomdleilmzasbj6lcc7"})
+```
 
 * License
 

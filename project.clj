@@ -1,6 +1,6 @@
-(defproject hashname "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject ca.unstate/hashname "1.0.1"
+  :description "Implements the telehash hashname protocol in clojure."
+  :url "http://telehash.org"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[commons-codec "1.10"] 
