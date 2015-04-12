@@ -1,4 +1,4 @@
-(defproject ca.unstate/hashname "1.0.1"
+(defproject ca.unstate/hashname "1.0.2"
   :description "Implements the telehash hashname protocol in clojure."
   :url "http://telehash.org"
   :license {:name "Eclipse Public License"
